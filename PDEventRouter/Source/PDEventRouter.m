@@ -8,6 +8,10 @@
 
 #import "PDEventRouter.h"
 
+PDEventRouterResponseCode const PDEventRouterResponseCodeUndefined  = NSNotFound;
+PDEventRouterResponseCode const PDEventRouterResponseCodeSuccess    = 0;
+PDEventRouterResponseCode const PDEventRouterResponseCodeFailed     = 948392430293;
+
 #define Lock() dispatch_semaphore_wait(self->_lock, DISPATCH_TIME_FOREVER)
 #define Unlock() dispatch_semaphore_signal(self->_lock)
 
@@ -58,12 +62,25 @@
     Unlock();
 }
 
+- (void)resignListen:(NSString *)uri {
+    Lock();
+    [_listener removeObjectForKey:uri];
+    Unlock();
+}
+
 - (void)request:(NSString *)uri params:(NSDictionary *)params completion:(void (^)(PDEventResponse * _Nonnull))completion {
     Lock();
     void (^handler)(NSDictionary *, void (^)(PDEventResponse *)) = _listener[uri];
     Unlock();
     
-    !handler ?: handler(params, ^(PDEventResponse *response) {
+    if (!handler) {
+        NSString *message = [NSString stringWithFormat:@"Can not found uri `%@`!", uri];
+        PDEventResponse *response = [[PDEventResponse alloc] initWithCode:PDEventRouterResponseCodeUndefined message:message data:nil];
+        !completion ?: completion(response);
+        return;
+    }
+    
+    handler(params, ^(PDEventResponse *response) {
         !completion ?: completion(response);
     });
 }

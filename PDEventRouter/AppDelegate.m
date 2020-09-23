@@ -28,7 +28,7 @@
     [router listen:@"pipe://event/demo" handler:^(NSDictionary * _Nullable params, void (^ _Nonnull callback)(PDEventResponse * _Nonnull)) {
         NSLog(@"params = %@", params);
         
-        PDEventResponse *response = [PDEventResponse responseWithCode:PDEventRouterResponseSuccess
+        PDEventResponse *response = [PDEventResponse responseWithCode:PDEventRouterResponseCodeSuccess
                                                               message:@"success"
                                                                  data:@{@"key": @"value"}];
         !callback ?: callback(response);

@@ -26,6 +26,10 @@
     [router request:@"pipe://event/demo" params:nil completion:^(PDEventResponse * _Nonnull response) {
         NSLog(@"%@", response);
     }];
+    
+    [router request:@"undefined" params:nil completion:^(PDEventResponse * _Nonnull response) {
+        NSLog(@"response = %@", response);
+    }];
 }
 
 @end
